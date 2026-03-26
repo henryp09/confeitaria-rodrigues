@@ -41,6 +41,7 @@ const App = () => (
               <Route path="/encomenda" element={<Encomenda />} />
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/contato" element={<Contato />} />
+              <Route path="/pagamento-sucesso" element={<PagamentoSucesso />} />
 
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
