@@ -1,92 +1,85 @@
-import { Product, initialProducts } from "@/data/products";
+import { supabase } from "@/integrations/supabase/client";
 
-// Estado local dos produtos (simula banco de dados)
-let products: Product[] = [...initialProducts];
+export interface Product {
+  id: string;
+  name: string;
+  subtitle: string | null;
+  description: string;
+  price: number;
+  image_url: string;
+  category: string;
+  stripe_price_id: string | null;
+  active: boolean;
+}
 
-// Simula delay de API
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// Import local images as fallback mapping
+import boloChocolate from "@/assets/bolo-chocolate.jpg";
+import tortaMorango from "@/assets/torta-morango.jpg";
+import boloRedVelvet from "@/assets/bolo-red-velvet.jpg";
+import docinhos from "@/assets/docinhos.jpg";
 
-export const productService = {
-  // GET - Buscar todos os produtos
-  async getProducts(): Promise<Product[]> {
-    await delay(100);
-    return [...products];
-  },
-
-  // GET - Buscar produto por ID
-  async getProductById(id: string): Promise<Product | null> {
-    await delay(100);
-    return products.find((p) => p.id === id) || null;
-  },
-
-  // POST - Criar novo produto
-  async createProduct(product: Omit<Product, "id">): Promise<Product> {
-    await delay(100);
-    const newProduct: Product = {
-      ...product,
-      id: Date.now().toString(),
-    };
-    products.push(newProduct);
-    return newProduct;
-  },
-
-  // PUT - Atualizar produto
-  async updateProduct(id: string, updates: Partial<Product>): Promise<Product | null> {
-    await delay(100);
-    const index = products.findIndex((p) => p.id === id);
-    if (index === -1) return null;
-    
-    products[index] = { ...products[index], ...updates };
-    return products[index];
-  },
-
-  // DELETE - Remover produto
-  async deleteProduct(id: string): Promise<boolean> {
-    await delay(100);
-    const index = products.findIndex((p) => p.id === id);
-    if (index === -1) return false;
-    
-    products.splice(index, 1);
-    return true;
-  },
-
-  // Buscar por categoria
-  async getProductsByCategory(category: string): Promise<Product[]> {
-    await delay(100);
-    if (category === "Todos") return [...products];
-    return products.filter((p) => p.category === category);
-  },
-
-  // Buscar por termo
-  async searchProducts(query: string): Promise<Product[]> {
-    await delay(100);
-    const lowerQuery = query.toLowerCase();
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(lowerQuery) ||
-        p.description.toLowerCase().includes(lowerQuery)
-    );
-  },
+const imageMap: Record<string, string> = {
+  "/assets/bolo-chocolate.jpg": boloChocolate,
+  "/assets/torta-morango.jpg": tortaMorango,
+  "/assets/bolo-red-velvet.jpg": boloRedVelvet,
+  "/assets/docinhos.jpg": docinhos,
 };
 
-/*
- * INTEGRAÇÃO COM BACKEND FUTURO:
- * 
- * Quando tiver um backend, substitua as funções acima por chamadas HTTP:
- * 
- * async getProducts(): Promise<Product[]> {
- *   const response = await fetch('/api/products');
- *   return response.json();
- * }
- * 
- * async createProduct(product: Omit<Product, 'id'>): Promise<Product> {
- *   const response = await fetch('/api/products', {
- *     method: 'POST',
- *     headers: { 'Content-Type': 'application/json' },
- *     body: JSON.stringify(product)
- *   });
- *   return response.json();
- * }
- * 
- * E assim por diante para os outros métodos.
- */
+export const resolveImage = (imageUrl: string): string => {
+  return imageMap[imageUrl] || imageUrl;
+};
+
+export const formatPrice = (price: number): string => {
+  return price.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
+export const productService = {
+  async getProducts(): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("active", true)
+      .order("created_at");
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getProductById(id: string): Promise<Product | null> {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getProductsByCategory(category: string): Promise<Product[]> {
+    if (category === "Todos") return this.getProducts();
+    
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("active", true)
+      .eq("category", category);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async searchProducts(query: string): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("active", true)
+      .or(`name.ilike.%${query}%,description.ilike.%${query}%`);
+
+    if (error) throw error;
+    return data || [];
+  },
+};
