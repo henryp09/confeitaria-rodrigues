@@ -6,8 +6,7 @@ import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
 import { Search, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { productService } from "@/services/productService";
-import { Product, formatPrice } from "@/data/products";
+import { productService, Product, formatPrice, resolveImage } from "@/services/productService";
 import { useCart } from "@/contexts/CartContext";
 
 const Cardapio = () => {
@@ -49,19 +48,15 @@ const Cardapio = () => {
       <Header />
 
       <main className="container mx-auto px-4 pt-24 pb-16">
-        {/* Title Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
           <h1 className="text-5xl font-bold text-primary mb-3">Nosso Cardápio</h1>
-          <p className="text-lg text-muted-foreground italic">
-            Delícias para todos os momentos
-          </p>
+          <p className="text-lg text-muted-foreground italic">Delícias para todos os momentos</p>
         </motion.div>
 
-        {/* Search Bar */}
         <div className="max-w-md mx-auto mb-8">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -75,7 +70,6 @@ const Cardapio = () => {
           </div>
         </div>
 
-        {/* Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           {filters.map((filter) => (
             <button
@@ -92,7 +86,6 @@ const Cardapio = () => {
           ))}
         </div>
 
-        {/* Products Grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             {[1, 2, 3, 4].map((i) => (
@@ -119,33 +112,26 @@ const Cardapio = () => {
                   <div className="bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-border/30 group cursor-pointer">
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <img
-                        src={product.image}
+                        src={resolveImage(product.image_url)}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
-                      {/* Category Badge */}
                       <div className="absolute top-3 right-3 bg-primary/90 text-white px-3 py-1 rounded-full text-xs font-medium">
                         {product.category}
                       </div>
                     </div>
                     <div className="p-5">
                       <div className="mb-3">
-                        <h3 className="text-xl font-bold text-primary mb-1">
-                          {product.name}
-                        </h3>
+                        <h3 className="text-xl font-bold text-primary mb-1">{product.name}</h3>
                         {product.subtitle && (
-                          <p className="text-xs text-muted-foreground">
-                            {product.subtitle}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{product.subtitle}</p>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mb-4 leading-relaxed line-clamp-2">
                         {product.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <p className="text-2xl font-bold text-primary">
-                          {formatPrice(product.price)}
-                        </p>
+                        <p className="text-2xl font-bold text-primary">{formatPrice(product.price)}</p>
                         <Button
                           size="icon"
                           variant="ghost"

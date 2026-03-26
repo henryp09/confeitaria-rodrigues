@@ -15,6 +15,7 @@ import Encomenda from "./pages/Encomenda";
 import Sobre from "./pages/Sobre";
 import Contato from "./pages/Contato";
 import NotFound from "./pages/NotFound";
+import PagamentoSucesso from "./pages/PagamentoSucesso";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/encomenda" element={<Encomenda />} />
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/contato" element={<Contato />} />
+              <Route path="/pagamento-sucesso" element={<PagamentoSucesso />} />
 
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
