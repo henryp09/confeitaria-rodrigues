@@ -15,6 +15,7 @@ import Encomenda from "./pages/Encomenda";
 import Sobre from "./pages/Sobre";
 import Contato from "./pages/Contato";
 import NotFound from "./pages/NotFound";
+import PagamentoSucesso from "./pages/PagamentoSucesso";
 
 // Admin Pages
 import AdminLogin from "./pages/admin/AdminLogin";

@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { productService } from "@/services/productService";
-import { Product, formatPrice } from "@/data/products";
+import { productService, Product, formatPrice, resolveImage } from "@/services/productService";
 import { useCart } from "@/contexts/CartContext";
 import { ShoppingCart, ArrowLeft, Minus, Plus } from "lucide-react";
 
@@ -56,12 +55,8 @@ const ProductDetails = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 pt-24 pb-16 text-center">
-          <h1 className="text-2xl font-bold text-primary mb-4">
-            Produto não encontrado
-          </h1>
-          <Button onClick={() => navigate("/cardapio")}>
-            Voltar ao Cardápio
-          </Button>
+          <h1 className="text-2xl font-bold text-primary mb-4">Produto não encontrado</h1>
+          <Button onClick={() => navigate("/cardapio")}>Voltar ao Cardápio</Button>
         </main>
         <Footer />
       </div>
@@ -71,7 +66,6 @@ const ProductDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <main className="container mx-auto px-4 pt-24 pb-16">
         <Link
           to="/cardapio"
@@ -88,7 +82,7 @@ const ProductDetails = () => {
             className="relative aspect-square rounded-2xl overflow-hidden shadow-xl"
           >
             <img
-              src={product.image}
+              src={resolveImage(product.image_url)}
               alt={product.name}
               className="w-full h-full object-cover"
             />
@@ -102,58 +96,33 @@ const ProductDetails = () => {
             animate={{ opacity: 1, x: 0 }}
             className="flex flex-col"
           >
-            <h1 className="text-4xl font-bold text-primary mb-2">
-              {product.name}
-            </h1>
+            <h1 className="text-4xl font-bold text-primary mb-2">{product.name}</h1>
             {product.subtitle && (
-              <p className="text-lg text-muted-foreground mb-4">
-                {product.subtitle}
-              </p>
+              <p className="text-lg text-muted-foreground mb-4">{product.subtitle}</p>
             )}
-
-            <p className="text-lg text-foreground leading-relaxed mb-6">
-              {product.description}
-            </p>
-
-            <div className="text-4xl font-bold text-primary mb-8">
-              {formatPrice(product.price)}
-            </div>
+            <p className="text-lg text-foreground leading-relaxed mb-6">{product.description}</p>
+            <div className="text-4xl font-bold text-primary mb-8">{formatPrice(product.price)}</div>
 
             <div className="flex items-center gap-4 mb-6">
               <span className="text-foreground font-medium">Quantidade:</span>
               <div className="flex items-center gap-3">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
+                <Button size="icon" variant="outline" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
                   <Minus className="w-4 h-4" />
                 </Button>
-                <span className="w-12 text-center text-xl font-bold">
-                  {quantity}
-                </span>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
+                <span className="w-12 text-center text-xl font-bold">{quantity}</span>
+                <Button size="icon" variant="outline" onClick={() => setQuantity(quantity + 1)}>
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
             </div>
 
-            <Button
-              size="lg"
-              className="w-full md:w-auto gap-2"
-              onClick={handleAddToCart}
-            >
+            <Button size="lg" className="w-full md:w-auto gap-2" onClick={handleAddToCart}>
               <ShoppingCart className="w-5 h-5" />
               Adicionar ao Carrinho
             </Button>
           </motion.div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
